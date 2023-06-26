@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1092375420160:android:4089ef10ba29e0159367e5",
+        "mobilesdk_app_id": "1:1092375420160:android:01895963d2b849d59367e5",
         "android_client_info": {
-          "package_name": "com.example.fbdownloader"
+          "package_name": "com.bluelock.fbdownloader"
         }
       },
       "oauth_client": [

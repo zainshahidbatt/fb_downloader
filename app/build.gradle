@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.fbdownloader'
+    namespace 'com.bluelock.fbdownloader'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.fbdownloader"
+        applicationId "com.bluelock.fbdownloader"
         minSdk 24
         targetSdk 33
         versionCode 1

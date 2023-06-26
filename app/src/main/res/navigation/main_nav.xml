@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.example.fbdownloader.ui.presentation.splash.SplashFragment"
+        android:name="com.bluelock.fbdownloader.ui.presentation.splash.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" />
 </navigation>
