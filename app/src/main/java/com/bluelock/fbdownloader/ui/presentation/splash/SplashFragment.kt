@@ -14,19 +14,22 @@ import com.bluelock.fbdownloader.ui.activities.DashBoardActivity
 import com.bluelock.fbdownloader.ui.presentation.base.BaseFragment
 import com.bluelock.fbdownloader.util.isConnected
 import com.example.ads.GoogleManager
+import com.example.ads.newStrategy.types.GoogleInterstitialType
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSplashBinding
         get() = FragmentSplashBinding::inflate
-    var progressStatus = 0
+    private var progressStatus = 0
 
     @Inject
     lateinit var googleManager: GoogleManager
@@ -37,6 +40,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     override fun onCreatedView() {
         binding.apply {
+
+
             progressStatus = progressBar.progress
 
             lifecycleScope.launch {
@@ -52,10 +57,14 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                             if (getAppOpenAd()) {
                                 Log.d("jejesplash", "done")
                             } else {
-                                navigateToNextScreen()
+                                showInterstitialAd {
+                                    navigateToNextScreen()
+                                }
                             }
                         } else {
-                            navigateToNextScreen()
+                            showInterstitialAd {
+                                navigateToNextScreen()
+                            }
                         }
                         break
                     }
@@ -93,4 +102,32 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
         return false
     }
+
+    private fun showInterstitialAd(callback: () -> Unit) {
+        if (remoteConfig.showInterstitial) {
+            val ad: InterstitialAd? =
+                googleManager.createInterstitialAd(GoogleInterstitialType.MEDIUM)
+
+            if (ad == null) {
+                callback.invoke()
+                return
+            } else {
+                ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        super.onAdDismissedFullScreenContent()
+                        callback.invoke()
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                        super.onAdFailedToShowFullScreenContent(error)
+                        callback.invoke()
+                    }
+                }
+                ad.show(requireActivity())
+            }
+        } else {
+            callback.invoke()
+        }
+    }
+
 }

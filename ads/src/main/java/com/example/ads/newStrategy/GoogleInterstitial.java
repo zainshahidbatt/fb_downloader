@@ -21,6 +21,14 @@ public class GoogleInterstitial {
 
     private final String adUnitId = "ca-app-pub-9507635869843997/2651939565";
 
+    private final String high = "ca-app-pub-9507635869843997/7902256031";
+
+    private final String medium = "ca-app-pub-9507635869843997/7710684340";
+
+    private final String one = "ca-app-pub-9507635869843997/4840978421";
+
+    private final String two = "ca-app-pub-9507635869843997/5770916715";
+
     public GoogleInterstitial(Context context) {
         instantiateList();
         loadInitialInterstitials(context);
@@ -29,11 +37,11 @@ public class GoogleInterstitial {
     private void instantiateList() {
         adUnits = new ArrayList<>();
 
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
+        adUnits.add(0, new ArrayList<Object>(Arrays.asList(high, new Stack<AppOpenAd>())));
+        adUnits.add(1, new ArrayList<Object>(Arrays.asList(medium, new Stack<AppOpenAd>())));
+        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
+        adUnits.add(3, new ArrayList<Object>(Arrays.asList(one, new Stack<AppOpenAd>())));
+        adUnits.add(4, new ArrayList<Object>(Arrays.asList(two, new Stack<AppOpenAd>())));
     }
 
     public void loadInitialInterstitials(Context context) {

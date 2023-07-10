@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings.Secure
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -22,10 +23,12 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +54,7 @@ import com.bluelock.fbdownloader.util.Utils.startDownload
 import com.bluelock.fbdownloader.util.adapters.ListAdapter
 import com.bluelock.fbdownloader.util.isConnected
 import com.example.ads.GoogleManager
+import com.example.ads.databinding.MediumNativeAdLayoutBinding
 import com.example.ads.databinding.NativeAdBannerLayoutBinding
 import com.example.ads.newStrategy.types.GoogleInterstitialType
 import com.example.ads.ui.binding.loadNativeAd
@@ -62,8 +66,17 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.ump.ConsentDebugSettings
+import com.google.android.ump.ConsentForm
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
 import com.permissionx.guolindev.PermissionX
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -71,12 +84,17 @@ import java.io.File
 import java.net.URL
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
+@RequiresApi(Build.VERSION_CODES.O)
 class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var binding: ActivityHomeBinding
 
     private var nativeAd: NativeAd? = null
+
+    private lateinit var consentInformation: ConsentInformation
+    private lateinit var consentForm: ConsentForm
 
     @Inject
     lateinit var googleManager: GoogleManager
@@ -87,6 +105,7 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
 
     @Inject
     lateinit var remoteConfig: RemoteConfig
+
 
     private val TAG = "MainActivity"
     private val strName = "facebook"
@@ -99,6 +118,7 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
     private var downloadAPIInterface: DownloadAPIInterface? = null
     private var activity: Activity? = null
     private var onCreateIsCalled = false
+    lateinit var downloadingDialog: BottomSheetDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,14 +147,123 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
             IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
         )
 
+        showDownloadingDialog()
+        showDropDown()
+        getConsentForm()
         initViews()
         handleIntent()
         observe()
         showNativeAd()
+        val a_Id = Secure.getString(contentResolver, Secure.ANDROID_ID)
+        Log.d("jeje_id", a_Id)
     }
+
+    fun getConsentForm() {
+
+        val debugSettings = ConsentDebugSettings.Builder(this)
+            .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+            .addTestDeviceHashedId("faa08620dd1a364a")
+            .build()
+
+
+        val params = ConsentRequestParameters
+            .Builder()
+            .setConsentDebugSettings(debugSettings)
+            .build()
+
+        consentInformation = UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(
+            this,
+            params,
+            {
+                Log.d("jeje_consentForm", "success")
+                loadForm()
+            },
+            {
+                Log.d("jeje_consentForm", "un_success")
+            })
+    }
+
+    fun loadForm() {
+        Log.d("jeje_loadForm", "success")
+
+        // Loads a consent form. Must be called on the main thread.
+        UserMessagingPlatform.loadConsentForm(
+            this,
+            {
+                Log.d("jeje_inside", "success")
+                Log.d("jeje_status_of", consentInformation.consentStatus.toString())
+
+
+                if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
+                    Log.d("jeje_insideFun", "success")
+                    consentForm.show(
+                        this,
+                        ConsentForm.OnConsentFormDismissedListener {
+                            if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.OBTAINED) {
+                                Log.d("jeje_obtain", "success")
+                            }
+
+                            // Handle dismissal by reloading form.
+                            loadForm()
+                            Log.d("jeje_Dismiss", "UnSuc")
+                        }
+                    )
+                }
+                if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.UNKNOWN) {
+                    Log.d("jeje_status", "unknown")
+                }
+                if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.OBTAINED) {
+                    Log.d("jeje_status", "obtain")
+                }
+                if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.NOT_REQUIRED) {
+                    Log.d("jeje_status", "notReq")
+                }
+            },
+            {
+                Log.d("jeje_loadForm", "un_success")
+            }
+        )
+    }
+
+    private fun showDropDown() {
+        val nativeAdCheck = googleManager.createNativeFull()
+        val nativeAd = googleManager.createNativeFull()
+        Log.d("ggg_nul", "nativeAd:${nativeAdCheck}")
+
+        nativeAdCheck?.let {
+            Log.d("ggg_lest", "nativeAdEx:${nativeAd}")
+            binding.apply {
+                dropLayout.bringToFront()
+                nativeViewDrop.bringToFront()
+            }
+            val nativeAdLayoutBinding = MediumNativeAdLayoutBinding.inflate(layoutInflater)
+            nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
+            binding.nativeViewDrop.removeAllViews()
+            binding.nativeViewDrop.addView(nativeAdLayoutBinding.root)
+            binding.nativeViewDrop.visibility = View.VISIBLE
+            binding.dropLayout.visibility = View.VISIBLE
+
+            binding.btnDropDown.setOnClickListener {
+                showInterstitialAd {
+                    binding.dropLayout.visibility = View.GONE
+                }
+            }
+            binding.btnDropUp.visibility = View.INVISIBLE
+
+        }
+
+    }
+
 
     private fun observe() {
         binding.apply {
+
+            btnDownloaded.setOnClickListener {
+                showInterstitialAd {
+                    startActivity(Intent(this@DashBoardActivity, DownloadedActivity::class.java))
+                }
+            }
 
             btnSetting.setOnClickListener {
                 showInterstitialAd {
@@ -629,30 +758,39 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
                 dialog.show()
                 return
             }
-            val dialog = BottomSheetDialog(this, R.style.SheetDialog)
-            dialog.setContentView(R.layout.dialog_bottom_start_download)
-            val videoQualityTv = dialog.findViewById<Button>(R.id.btn_clear)
-            val adView = dialog.findViewById<FrameLayout>(R.id.nativeViewAdDownload)
-            if (remoteConfig.nativeAd) {
-                nativeAd = googleManager.createNativeAdSmall()
-                nativeAd?.let {
-                    val nativeAdLayoutBinding = NativeAdBannerLayoutBinding.inflate(layoutInflater)
-                    nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
-                    adView?.removeAllViews()
-                    adView?.addView(nativeAdLayoutBinding.root)
-                    adView?.visibility = View.VISIBLE
+            lifecycleScope.launch {
+
+                val dialog = BottomSheetDialog(this@DashBoardActivity, R.style.SheetDialog)
+                dialog.setContentView(R.layout.dialog_bottom_start_download)
+                val videoQualityTv = dialog.findViewById<Button>(R.id.btn_clear)
+                val adView = dialog.findViewById<FrameLayout>(R.id.nativeViewAdDownload)
+                if (remoteConfig.nativeAd) {
+                    nativeAd = googleManager.createNativeAdSmall()
+                    nativeAd?.let {
+                        val nativeAdLayoutBinding =
+                            NativeAdBannerLayoutBinding.inflate(layoutInflater)
+                        nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
+                        adView?.removeAllViews()
+                        adView?.addView(nativeAdLayoutBinding.root)
+                        adView?.visibility = View.VISIBLE
+                    }
                 }
+
+                dialog.behavior.isDraggable = false
+                dialog.setCanceledOnTouchOutside(false)
+                videoQualityTv?.setOnClickListener {
+                    showInterstitialAd {
+                        videoDownloadR(link, urlType)
+                        dialog.dismiss()
+                        lifecycleScope.launch {
+                            delay(2000)
+                            downloadingDialog.show()
+                        }
+                    }
+                }
+                dialog.show()
             }
 
-            dialog.behavior.isDraggable = false
-            dialog.setCanceledOnTouchOutside(false)
-            videoQualityTv?.setOnClickListener {
-                showInterstitialAd {
-                    videoDownloadR(link, urlType)
-                    dialog.dismiss()
-                }
-            }
-            dialog.show()
         } catch (e: NullPointerException) {
             e.printStackTrace()
             Log.d(TAG, "onPostExecute: error!!!$e")
@@ -814,38 +952,44 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
                     videoPath = Environment.getExternalStorageDirectory().toString() +
                             "/Download" + Utils.RootDirectoryMoz + fVideo?.getFileName()
                 }
+                lifecycleScope.launch {
 
-                val dialog = BottomSheetDialog(this@DashBoardActivity, R.style.SheetDialog)
-                dialog.setContentView(R.layout.dialog_download_success)
-                val btnOk = dialog.findViewById<Button>(R.id.btn_clear)
-                val btnClose = dialog.findViewById<ImageView>(R.id.ivCross)
-                val adView = dialog.findViewById<FrameLayout>(R.id.nativeViewAdSuccess)
-                dialog.behavior.isDraggable = false
-                dialog.setCanceledOnTouchOutside(false)
-                if (showNatAd()) {
-                    nativeAd = googleManager.createNativeAdSmall()
-                    nativeAd?.let {
-                        val nativeAdLayoutBinding =
-                            NativeAdBannerLayoutBinding.inflate(layoutInflater)
-                        nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
-                        adView?.removeAllViews()
-                        adView?.addView(nativeAdLayoutBinding.root)
-                        adView?.visibility = View.VISIBLE
-                    }
+                        downloadingDialog.dismiss()
+                        val dialog = BottomSheetDialog(this@DashBoardActivity, R.style.SheetDialog)
+                        dialog.setContentView(R.layout.dialog_download_success)
+                        val btnOk = dialog.findViewById<Button>(R.id.btn_clear)
+                        val btnClose = dialog.findViewById<ImageView>(R.id.ivCross)
+                        val adView = dialog.findViewById<FrameLayout>(R.id.nativeViewAdSuccess)
+                        dialog.behavior.isDraggable = false
+                        dialog.setCanceledOnTouchOutside(false)
+                        if (showNatAd()) {
+                            nativeAd = googleManager.createNativeAdSmall()
+                            nativeAd?.let {
+                                val nativeAdLayoutBinding =
+                                    NativeAdBannerLayoutBinding.inflate(layoutInflater)
+                                nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
+                                adView?.removeAllViews()
+                                adView?.addView(nativeAdLayoutBinding.root)
+                                adView?.visibility = View.VISIBLE
+                            }
+                        }
+
+                        btnOk?.setOnClickListener {
+                            showInterstitialAd {
+                                dialog.dismiss()
+                            }
+                        }
+                        btnClose?.setOnClickListener {
+                            showInterstitialAd {
+                                dialog.dismiss()
+                            }
+                        }
+
+                        dialog.show()
+
                 }
 
-                btnOk?.setOnClickListener {
-                    showInterstitialAd {
-                        dialog.dismiss()
-                    }
-                }
-                btnClose?.setOnClickListener {
-                    showInterstitialAd {
-                        dialog.dismiss()
-                    }
-                }
 
-                dialog.show()
 
                 db?.updateState(id, FVideo.COMPLETE)
                 if (videoPath != null) db?.setUri(id, videoPath)
@@ -873,6 +1017,29 @@ class DashBoardActivity : AppCompatActivity(), View.OnClickListener {
         return true
 
         return false
+    }
+
+    private fun showDownloadingDialog() {
+        downloadingDialog = BottomSheetDialog(this, R.style.SheetDialog)
+        downloadingDialog.setContentView(R.layout.dialog_downloading)
+        val adView =
+            downloadingDialog.findViewById<FrameLayout>(R.id.nativeViewAdDownload)
+        if (remoteConfig.nativeAd) {
+            nativeAd = googleManager.createNativeAdSmall()
+            nativeAd?.let {
+                val nativeAdLayoutBinding =
+                    NativeAdBannerLayoutBinding.inflate(layoutInflater)
+                nativeAdLayoutBinding.nativeAdView.loadNativeAd(ad = it)
+                adView?.removeAllViews()
+                adView?.addView(nativeAdLayoutBinding.root)
+                adView?.visibility = View.VISIBLE
+            }
+        }
+
+        downloadingDialog.behavior.isDraggable = false
+        downloadingDialog.setCanceledOnTouchOutside(false)
+
+
     }
 
     fun showNatAd(): Boolean {

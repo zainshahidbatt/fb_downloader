@@ -23,8 +23,15 @@ public class GoogleNativeForSave {
 
     final private int totalLevels = 4;
     private ArrayList<ArrayList<Object>> adUnits;
-    private final String adUnitId = "ca-app-pub-9507635869843997/2049304336";
+    private final String adUnitId = "ca-app-pub-9507635869843997/8054886000";
 
+    private final String nativeHigh = "ca-app-pub-9507635869843997/8001230906";
+
+    private final String nativeMedium = "ca-app-pub-9507635869843997/6604388750";
+
+    private final String nativeOne = "ca-app-pub-9507635869843997/7426515839";
+
+    private final String nativeTwo = "ca-app-pub-9507635869843997/3487270822";
 
     public GoogleNativeForSave(Context context) {
         instantiateList();
@@ -34,12 +41,13 @@ public class GoogleNativeForSave {
     private void instantiateList() {
         adUnits = new ArrayList<>();
 
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
+        adUnits.add(0, new ArrayList<Object>(Arrays.asList(nativeHigh, new Stack<AppOpenAd>())));
+        adUnits.add(1, new ArrayList<Object>(Arrays.asList(nativeMedium, new Stack<AppOpenAd>())));
         adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
+        adUnits.add(3, new ArrayList<Object>(Arrays.asList(nativeOne, new Stack<AppOpenAd>())));
+        adUnits.add(4, new ArrayList<Object>(Arrays.asList(nativeTwo, new Stack<AppOpenAd>())));
     }
+
 
     public void loadnativead(Context context) {
         NativeAdLoad(context, totalLevels);

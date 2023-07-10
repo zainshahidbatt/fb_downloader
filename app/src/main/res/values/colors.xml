@@ -14,7 +14,10 @@
     <color name="warm_yellow">#FCE38A</color>
     <color name="dark_pink">#FF0281</color>
     <color name="warm_pink">#fc746f</color>
-<color name="dark_blue">#1977F3</color>
+    <color name="dark_blue">#1977F3</color>
+    <color name="white_two">#f3f3f3</color>
+    <color name="mischka">#e6e7e9</color>
+
     <color name="grey_level_1">#646464</color>
     <color name="grey_level_2">#4E4E4E</color>
     <color name="grey_level_3">#393939</color>
