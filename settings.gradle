@@ -16,7 +16,7 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "FB Downloader"
+rootProject.name = "FB"
 include ':app'
 include ':ads'
 include ':analytics'

@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "1092375420160",
-    "project_id": "fb-downloader-cb002",
-    "storage_bucket": "fb-downloader-cb002.appspot.com"
+    "project_number": "474689791624",
+    "project_id": "fb-new-11d50",
+    "storage_bucket": "fb-new-11d50.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1092375420160:android:01895963d2b849d59367e5",
+        "mobilesdk_app_id": "1:474689791624:android:be14528ad25d46c43de13d",
         "android_client_info": {
-          "package_name": "com.bluelock.fbdownloader"
+          "package_name": "com.bluelock.fb"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1092375420160-2q3n1549i2mknrtuikc6brh1m4ut7nsk.apps.googleusercontent.com",
+          "client_id": "474689791624-rd8ps9tcd8ta1m0885g0cphlvfe6mmqo.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCnMsyQ0skO9EEAQxhUzAix-d6OcuYFJT0"
+          "current_key": "AIzaSyADwPC1n_CVb1ctTbygzOhgISnUeuo9XUM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1092375420160-2q3n1549i2mknrtuikc6brh1m4ut7nsk.apps.googleusercontent.com",
+              "client_id": "474689791624-rd8ps9tcd8ta1m0885g0cphlvfe6mmqo.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

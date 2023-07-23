@@ -1,132 +1,110 @@
-package com.example.ads.newStrategy;//package com.vyroai.autocutcut.ads.max;
+package com.example.ads.newStrategy
+
+import android.content.Context
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import java.util.Arrays
+import java.util.Stack
+
+//package com.vyroai.autocutcut.ads.max;
 //
+class GoogleInterstitial(context: Context?) {
+    private val totalLevels = 4
+    private var adUnits: ArrayList<ArrayList<Any>>? = null
+    private val inter5 = "ca-app-pub-9507635869843997/3386545508"
+    private val inter4 = "ca-app-pub-9507635869843997/4687184735"
+    private val interHigh = "ca-app-pub-9507635869843997/2384401125"
+    private val interMed = "ca-app-pub-9507635869843997/9599448684"
+    private val interAll = "ca-app-pub-9507635869843997/6697953177"
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
-public class GoogleInterstitial {
-
-    private final int totalLevels = 4;
-    private ArrayList<ArrayList<Object>> adUnits;
-
-    private final String adUnitId = "ca-app-pub-9507635869843997/2651939565";
-
-    private final String high = "ca-app-pub-9507635869843997/7902256031";
-
-    private final String medium = "ca-app-pub-9507635869843997/7710684340";
-
-    private final String one = "ca-app-pub-9507635869843997/4840978421";
-
-    private final String two = "ca-app-pub-9507635869843997/5770916715";
-
-    public GoogleInterstitial(Context context) {
-        instantiateList();
-        loadInitialInterstitials(context);
+    init {
+        instantiateList()
+        loadInitialInterstitials(context)
     }
 
-    private void instantiateList() {
-        adUnits = new ArrayList<>();
-
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(high, new Stack<AppOpenAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(medium, new Stack<AppOpenAd>())));
-        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(one, new Stack<AppOpenAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(two, new Stack<AppOpenAd>())));
+    private fun instantiateList() {
+        adUnits = ArrayList()
+        adUnits!!.add(0, ArrayList(listOf(inter5, Stack<InterstitialAd>())))
+        adUnits!!.add(1, ArrayList(listOf(inter4, Stack<InterstitialAd>())))
+        adUnits!!.add(2, ArrayList(listOf(interHigh, Stack<InterstitialAd>())))
+        adUnits!!.add(3, ArrayList(listOf(interMed, Stack<InterstitialAd>())))
+        adUnits!!.add(4, ArrayList(listOf(interAll, Stack<InterstitialAd>())))
     }
 
-    public void loadInitialInterstitials(Context context) {
-        InterstitialAdLoad(context, totalLevels);
+    fun loadInitialInterstitials(context: Context?) {
+        InterstitialAdLoad(context, totalLevels)
     }
 
-
-    public InterstitialAd getMediumAd(Context activity) {
-        return getInterstitialAd(activity, 1);
+    fun getMediumAd(activity: Context?): InterstitialAd? {
+        return getInterstitialAd(activity, 1)
     }
 
-    public InterstitialAd getHighFloorAd(Context activity) {
-        return getInterstitialAd(activity, 2);
+    fun getHighFloorAd(activity: Context?): InterstitialAd? {
+        return getInterstitialAd(activity, 2)
     }
 
-    public InterstitialAd getDefaultAd(Context activity) {
-        return getInterstitialAd(activity, 0);
+    fun getDefaultAd(activity: Context?): InterstitialAd? {
+        return getInterstitialAd(activity, 0)
     }
 
-
-    public InterstitialAd getInterstitialAd(Context activity, int maxLevel) {
-        for (int i = totalLevels; i >= 0; i--) {
-
+    fun getInterstitialAd(activity: Context?, maxLevel: Int): InterstitialAd? {
+        for (i in totalLevels downTo 0) {
             if (maxLevel > i) {
-                break;
+                break
             }
-
-            ArrayList<Object> list = adUnits.get(i);
-            String adunitid = (String) list.get(0);
-            Stack<InterstitialAd> stack = (Stack<InterstitialAd>) list.get(1);
-
-            InterstitialAdLoadSpecific(activity, adunitid, stack);
-
+            val list = adUnits!![i]
+            val adunitid = list[0] as String
+            val stack = list[1] as Stack<InterstitialAd>
+            InterstitialAdLoadSpecific(activity, adunitid, stack)
             if (stack != null && !stack.isEmpty()) {
-                return stack.pop();
+                return stack.pop()
             }
         }
-
-        return null;
+        return null
     }
 
-    public void InterstitialAdLoad(Context activity, int level) {
-
+    fun InterstitialAdLoad(activity: Context?, level: Int) {
         if (level < 0) {
-            return;
+            return
         }
-
-        if (adUnits.size() < level) {
-            return;
+        if (adUnits!!.size < level) {
+            return
         }
-
-        ArrayList<Object> list = adUnits.get(level);
-        String adunitid = (String) list.get(0);
-        Stack<InterstitialAd> stack = (Stack<InterstitialAd>) list.get(1);
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(activity, adunitid, adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                super.onAdFailedToLoad(loadAdError);
-                InterstitialAdLoad(activity, level - 1);
+        val list = adUnits!![level]
+        val adunitid = list[0] as String
+        val stack = list[1] as Stack<InterstitialAd>
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(activity, adunitid, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                super.onAdFailedToLoad(loadAdError)
+                InterstitialAdLoad(activity, level - 1)
             }
 
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                super.onAdLoaded(interstitialAd);
-                stack.push(interstitialAd);
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                super.onAdLoaded(interstitialAd)
+                stack.push(interstitialAd)
             }
-        });
+        })
     }
 
-    public void InterstitialAdLoadSpecific(Context activity, String adUnitId, Stack<InterstitialAd> stack) {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(activity, adUnitId, adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                super.onAdFailedToLoad(loadAdError);
+    fun InterstitialAdLoadSpecific(
+        activity: Context?,
+        adUnitId: String?,
+        stack: Stack<InterstitialAd>?
+    ) {
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(activity, adUnitId, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                super.onAdFailedToLoad(loadAdError)
             }
 
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                super.onAdLoaded(interstitialAd);
-                stack.push(interstitialAd);
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                super.onAdLoaded(interstitialAd)
+                stack!!.push(interstitialAd)
             }
-        });
+        })
     }
 }
-

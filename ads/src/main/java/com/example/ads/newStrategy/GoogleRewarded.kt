@@ -1,125 +1,103 @@
-package com.example.ads.newStrategy;//package com.vyroai.autocutcut.ads.max;
-//
+package com.example.ads.newStrategy
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
+import android.content.Context
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import java.util.Stack
 
 
-public class GoogleRewarded {
+class GoogleRewarded(context: Context?) {
+    private val totalLevels = 4
+    private var adUnits: ArrayList<ArrayList<Any>>? = null
+    private val reward5 = "ca-app-pub-9507635869843997/2420894293"
+    private val reward4 = "ca-app-pub-9507635869843997/4344350059"
+    private val rewardHigh = "ca-app-pub-9507635869843997/1307123172"
+    private val rewardMed = "ca-app-pub-9507635869843997/9596676735"
+    private val rewardAll = "ca-app-pub-9507635869843997/5845133985"
 
-    private final int totalLevels = 4;
-    private ArrayList<ArrayList<Object>> adUnits;
-    private final String adUnitId = "ca-app-pub-9507635869843997/7301631010";
-
-    public GoogleRewarded(Context context) {
-        instantiateList();
-        loadInitialRewards(context);
+    init {
+        instantiateList()
+        loadInitialRewards(context)
     }
 
-    private void instantiateList() {
-        adUnits = new ArrayList<>();
-
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<InterstitialAd>())));
+    private fun instantiateList() {
+        adUnits = ArrayList()
+        adUnits!!.add(0, ArrayList(listOf(reward5, Stack<RewardedAd>())))
+        adUnits!!.add(1, ArrayList(listOf(reward4, Stack<RewardedAd>())))
+        adUnits!!.add(2, ArrayList(listOf(rewardHigh, Stack<RewardedAd>())))
+        adUnits!!.add(3, ArrayList(listOf(rewardMed, Stack<RewardedAd>())))
+        adUnits!!.add(4, ArrayList(listOf(rewardAll, Stack<RewardedAd>())))
     }
 
-    public void loadInitialRewards(Context context) {
-        RewardedAdLoad(context, totalLevels);
+    fun loadInitialRewards(context: Context?) {
+        RewardedAdLoad(context, totalLevels)
     }
 
-
-    public RewardedAd getMediumAd(Context activity) {
-        return getRewardedAd(activity, 1);
+    fun getMediumAd(activity: Context?): RewardedAd? {
+        return getRewardedAd(activity, 1)
     }
 
-    public RewardedAd getHighFloorAd(Context activity) {
-        return getRewardedAd(activity, 2);
+    fun getHighFloorAd(activity: Context?): RewardedAd? {
+        return getRewardedAd(activity, 2)
     }
 
-    public RewardedAd getDefaultAd(Context activity) {
-        return getRewardedAd(activity, 0);
+    fun getDefaultAd(activity: Context?): RewardedAd? {
+        return getRewardedAd(activity, 0)
     }
 
-
-    public RewardedAd getRewardedAd(Context activity, int maxLevel) {
-        for (int i = totalLevels; i >= 0; i--) {
-
+    fun getRewardedAd(activity: Context?, maxLevel: Int): RewardedAd? {
+        for (i in totalLevels downTo 0) {
             if (maxLevel > i) {
-                break;
+                break
             }
-
-            ArrayList<Object> list = adUnits.get(i);
-            String adunitid = (String) list.get(0);
-            Stack<RewardedAd> stack = (Stack<RewardedAd>) list.get(1);
-
-            RewardedAdLoadSpecific(activity, adunitid, stack);
-
+            val list = adUnits!![i]
+            val adunitid = list[0] as String
+            val stack = list[1] as Stack<RewardedAd>
+            RewardedAdLoadSpecific(activity, adunitid, stack)
             if (stack != null && !stack.isEmpty()) {
-                return stack.pop();
+                return stack.pop()
             }
         }
-
-        return null;
+        return null
     }
 
-    public void RewardedAdLoad(Context activity, int level) {
-
+    fun RewardedAdLoad(activity: Context?, level: Int) {
         if (level < 0) {
-            return;
+            return
         }
-
-        if (adUnits.size() < level) {
-            return;
+        if (adUnits!!.size < level) {
+            return
         }
-
-        ArrayList<Object> list = adUnits.get(level);
-        String adunitid = (String) list.get(0);
-        Stack<RewardedAd> stack = (Stack<RewardedAd>) list.get(1);
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        RewardedAd.load(activity, adunitid, adRequest, new RewardedAdLoadCallback() {
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                super.onAdFailedToLoad(loadAdError);
-                RewardedAdLoad(activity, level - 1);
+        val list = adUnits!![level]
+        val adunitid = list[0] as String
+        val stack = list[1] as Stack<RewardedAd>
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(activity, adunitid, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                super.onAdFailedToLoad(loadAdError)
+                RewardedAdLoad(activity, level - 1)
             }
 
-            @Override
-            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
-                super.onAdLoaded(rewardedAd);
-                stack.push(rewardedAd);
+            override fun onAdLoaded(rewardedAd: RewardedAd) {
+                super.onAdLoaded(rewardedAd)
+                stack.push(rewardedAd)
             }
-        });
+        })
     }
 
-    public void RewardedAdLoadSpecific(Context activity, String adUnitId, Stack<RewardedAd> stack) {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        RewardedAd.load(activity, adUnitId, adRequest, new RewardedAdLoadCallback() {
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                super.onAdFailedToLoad(loadAdError);
+    fun RewardedAdLoadSpecific(activity: Context?, adUnitId: String?, stack: Stack<RewardedAd>?) {
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(activity, adUnitId, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                super.onAdFailedToLoad(loadAdError)
             }
 
-            @Override
-            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
-                super.onAdLoaded(rewardedAd);
-                stack.push(rewardedAd);
+            override fun onAdLoaded(rewardedAd: RewardedAd) {
+                super.onAdLoaded(rewardedAd)
+                stack!!.push(rewardedAd)
             }
-        });
+        })
     }
 }
-

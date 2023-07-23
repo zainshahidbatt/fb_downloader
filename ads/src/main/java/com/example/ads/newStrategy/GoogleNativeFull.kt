@@ -1,115 +1,81 @@
-package com.example.ads.newStrategy;//package com.vyroai.autocutcut.ads.max;
+package com.example.ads.newStrategy
+
+import android.content.Context
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.gms.ads.nativead.NativeAd
+import java.util.Arrays
+import java.util.Stack
+
+//package com.vyroai.autocutcut.ads.max;
 //
+class GoogleNativeFull(context: Context?) {
+    private val totalLevels = 4
+    private var adUnits: ArrayList<ArrayList<Any>>? = null
+    private val native5 = "ca-app-pub-9507635869843997/8809111197"
+    private val native4 = "ca-app-pub-9507635869843997/4267230957"
+    private val nativeHigh = "ca-app-pub-9507635869843997/9129826771"
+    private val nativeMed = "ca-app-pub-9507635869843997/3182531373"
+    private val nativeAll = "ca-app-pub-9507635869843997/5190581766"
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdLoader;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-import com.google.android.gms.ads.nativead.NativeAd;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
-
-public class GoogleNativeFull {
-
-    final private int totalLevels = 4;
-    private ArrayList<ArrayList<Object>> adUnits;
-
-
-    private final String adUnitId = "ca-app-pub-9507635869843997/8054886000";
-
-    private final String nativeHigh = "ca-app-pub-9507635869843997/8001230906";
-
-    private final String nativeMedium = "ca-app-pub-9507635869843997/6604388750";
-
-    private final String nativeOne = "ca-app-pub-9507635869843997/7426515839";
-
-    private final String nativeTwo = "ca-app-pub-9507635869843997/3487270822";
-
-    public GoogleNativeFull(Context context) {
-        instantiateList();
-        loadnativead(context);
+    init {
+        instantiateList()
+        loadnativead(context)
     }
 
-    private void instantiateList() {
-        adUnits = new ArrayList<>();
-
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(nativeHigh, new Stack<AppOpenAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(nativeMedium, new Stack<AppOpenAd>())));
-        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(nativeOne, new Stack<AppOpenAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(nativeTwo, new Stack<AppOpenAd>())));
+    private fun instantiateList() {
+        adUnits = ArrayList()
+        adUnits!!.add(0, ArrayList(listOf(native5, Stack<NativeAd>())))
+        adUnits!!.add(1, ArrayList(listOf(native4, Stack<NativeAd>())))
+        adUnits!!.add(2, ArrayList(listOf(nativeHigh, Stack<NativeAd>())))
+        adUnits!!.add(3, ArrayList(listOf(nativeMed, Stack<NativeAd>())))
+        adUnits!!.add(4, ArrayList(listOf(nativeAll, Stack<NativeAd>())))
     }
 
-    public void loadnativead(Context context) {
-        NativeAdLoad(context, totalLevels);
+    fun loadnativead(context: Context?) {
+        NativeAdLoad(context, totalLevels)
     }
 
-
-    public NativeAd getDefaultAd(Context activity) {
-        for (int i = totalLevels; i >= 0; i--) {
-
-            ArrayList<Object> list = adUnits.get(i);
-            String adunitid = (String) list.get(0);
-            Stack<NativeAd> stack = (Stack<NativeAd>) list.get(1);
-
-            NativeAdLoadSpecific(activity, adunitid, stack);
-
+    fun getDefaultAd(activity: Context?): NativeAd? {
+        for (i in totalLevels downTo 0) {
+            val list = adUnits!![i]
+            val adunitid = list[0] as String
+            val stack = list[1] as Stack<NativeAd>
+            NativeAdLoadSpecific(activity, adunitid, stack)
             if (stack != null && !stack.isEmpty()) {
-                return stack.pop();
+                return stack.pop()
             }
         }
-
-        return null;
+        return null
     }
 
-    public void NativeAdLoad(Context activity, int level) {
+    fun NativeAdLoad(activity: Context?, level: Int) {
         if (level < 0) {
-            return;
+            return
         }
-
-        if (adUnits.size() < level) {
-            return;
+        if (adUnits!!.size < level) {
+            return
         }
-
-        ArrayList<Object> list = adUnits.get(level);
-        String adunitid = (String) list.get(0);
-        Stack<NativeAd> stack = (Stack<NativeAd>) list.get(1);
-
-        final AdLoader adLoader = new AdLoader.Builder(activity, adunitid)
-                .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                    @Override
-                    public void onNativeAdLoaded(NativeAd ad) {
-                        stack.push(ad);
-                    }
-                }).withAdListener(new AdListener() {
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                        // Handle the failure by logging, altering the UI, and so on.
-                        NativeAdLoad(activity, level - 1);
-                    }
-                })
-                .build();
-
-        adLoader.loadAd(new AdRequest.Builder().build());
+        val list = adUnits!![level]
+        val adunitid = list[0] as String
+        val stack = list[1] as Stack<NativeAd>
+        val adLoader = AdLoader.Builder(activity, adunitid)
+            .forNativeAd { ad -> stack.push(ad) }.withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    // Handle the failure by logging, altering the UI, and so on.
+                    NativeAdLoad(activity, level - 1)
+                }
+            })
+            .build()
+        adLoader.loadAd(AdRequest.Builder().build())
     }
 
-    public void NativeAdLoadSpecific(Context activity, String adUnitId, Stack<NativeAd> stack) {
-        final AdLoader adLoader = new AdLoader.Builder(activity, adUnitId)
-                .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                    @Override
-                    public void onNativeAdLoaded(NativeAd ad) {
-                        stack.push(ad);
-                    }
-                }).build();
-
-        adLoader.loadAd(new AdRequest.Builder().build());
+    fun NativeAdLoadSpecific(activity: Context?, adUnitId: String?, stack: Stack<NativeAd>?) {
+        val adLoader = AdLoader.Builder(activity, adUnitId)
+            .forNativeAd { ad -> stack!!.push(ad) }.build()
+        adLoader.loadAd(AdRequest.Builder().build())
     }
 }
-

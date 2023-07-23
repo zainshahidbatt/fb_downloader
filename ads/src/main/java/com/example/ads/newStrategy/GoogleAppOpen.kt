@@ -1,109 +1,92 @@
-package com.example.ads.newStrategy;
+package com.example.ads.newStrategy
 
+import android.content.Context
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.gms.ads.appopen.AppOpenAd.AppOpenAdLoadCallback
+import java.util.Stack
 
-import android.content.Context;
+class GoogleAppOpen(context: Context?) {
+    private val totalLevels = 4
+    private var adUnits: ArrayList<ArrayList<Any>>? = null
+    private val appOpen5 = "ca-app-pub-9507635869843997/8174686375"
+    private val appOpen4 = "ca-app-pub-9507635869843997/9487768045"
+    private val appOpenHigh = "ca-app-pub-9507635869843997/4618584749"
+    private val appOpenMed = "ca-app-pub-9507635869843997/7053176397"
+    private val appOpenAll = "ca-app-pub-9507635869843997/1916399782"
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
-
-public class GoogleAppOpen {
-
-    final private int totalLevels = 4;
-    private ArrayList<ArrayList<Object>> adUnits;
-
-    private final String adUnitId = "ca-app-pub-9507635869843997/4675467674";
-
-    private final String high = "ca-app-pub-9507635869843997/5179109529";
-
-    private final String medium = "ca-app-pub-9507635869843997/3336325062";
-
-    private final String one = "ca-app-pub-9507635869843997/6920346858";
-
-    private final String two = "ca-app-pub-9507635869843997/9856721139";
-
-
-    public GoogleAppOpen(Context context) {
-        instantiateList();
-        loadAppopenStart(context);
+    init {
+        instantiateList()
+        loadAppopenStart(context)
     }
 
-
-    private void instantiateList() {
-        adUnits = new ArrayList<>();
-
-        adUnits.add(0, new ArrayList<Object>(Arrays.asList(high, new Stack<AppOpenAd>())));
-        adUnits.add(1, new ArrayList<Object>(Arrays.asList(medium, new Stack<AppOpenAd>())));
-        adUnits.add(2, new ArrayList<Object>(Arrays.asList(adUnitId, new Stack<AppOpenAd>())));
-        adUnits.add(3, new ArrayList<Object>(Arrays.asList(one, new Stack<AppOpenAd>())));
-        adUnits.add(4, new ArrayList<Object>(Arrays.asList(two, new Stack<AppOpenAd>())));
+    private fun instantiateList() {
+        adUnits = ArrayList()
+        adUnits!!.add(0, ArrayList(listOf(appOpen5, Stack<AppOpenAd>())))
+        adUnits!!.add(1, ArrayList(listOf(appOpen4, Stack<AppOpenAd>())))
+        adUnits!!.add(2, ArrayList(listOf(appOpenHigh, Stack<AppOpenAd>())))
+        adUnits!!.add(3, ArrayList(listOf(appOpenMed, Stack<AppOpenAd>())))
+        adUnits!!.add(4, ArrayList(listOf(appOpenAll, Stack<AppOpenAd>())))
     }
 
-    public void loadAppopenStart(Context context) {
-        AppOpenAdLoad(context, totalLevels);
+    fun loadAppopenStart(context: Context?) {
+        AppOpenAdLoad(context, totalLevels)
     }
 
-
-    public AppOpenAd getAd(Context activity) {
-        for (int i = totalLevels; i >= 0; i--) {
-            ArrayList<Object> list = adUnits.get(i);
-            String adunitid = (String) list.get(0);
-            Stack<AppOpenAd> stack = (Stack<AppOpenAd>) list.get(1);
-            AppOpenLoadSpecific(activity, adunitid, stack);
+    fun getAd(activity: Context?): AppOpenAd? {
+        for (i in totalLevels downTo 0) {
+            val list = adUnits!![i]
+            val adunitid = list[0] as String
+            val stack = list[1] as Stack<AppOpenAd>
+            AppOpenLoadSpecific(activity, adunitid, stack)
             if (stack != null && !stack.isEmpty()) {
-                return stack.pop();
+                return stack.pop()
             }
         }
-
-        return null;
+        return null
     }
 
-    public void AppOpenAdLoad(Context activity, int level) {
+    fun AppOpenAdLoad(activity: Context?, level: Int) {
         if (level < 0) {
-            return;
+            return
         }
-
-        if (adUnits.size() < level) {
-            return;
+        if (adUnits!!.size < level) {
+            return
         }
+        val list = adUnits!![level]
+        val adunitid = list[0] as String
+        val stack = list[1] as Stack<AppOpenAd>
+        val request = AdRequest.Builder().build()
+        AppOpenAd.load(
+            activity,
+            adunitid,
+            request,
+            AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+            object : AppOpenAdLoadCallback() {
+                override fun onAdLoaded(ad: AppOpenAd) {
+                    stack.push(ad)
+                }
 
-        ArrayList<Object> list = adUnits.get(level);
-        String adunitid = (String) list.get(0);
-        Stack<AppOpenAd> stack = (Stack<AppOpenAd>) list.get(1);
-
-        AdRequest request = new AdRequest.Builder().build();
-        AppOpenAd.load(activity, adunitid, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, new AppOpenAd.AppOpenAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull AppOpenAd ad) {
-                stack.push(ad);
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                AppOpenAdLoad(activity, level - 1);
-            }
-        });
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    AppOpenAdLoad(activity, level - 1)
+                }
+            })
     }
 
-    public void AppOpenLoadSpecific(Context activity, String adUnitId, Stack<AppOpenAd> stack) {
-        AdRequest request = new AdRequest.Builder().build();
+    fun AppOpenLoadSpecific(activity: Context?, adUnitId: String?, stack: Stack<AppOpenAd>?) {
+        val request = AdRequest.Builder().build()
+        AppOpenAd.load(
+            activity,
+            adUnitId,
+            request,
+            AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+            object : AppOpenAdLoadCallback() {
+                override fun onAdLoaded(ad: AppOpenAd) {
+                    stack!!.push(ad)
+                }
 
-        AppOpenAd.load(activity, adUnitId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, new AppOpenAd.AppOpenAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull AppOpenAd ad) {
-                stack.push(ad);
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-            }
-        });
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {}
+            })
     }
-
 }

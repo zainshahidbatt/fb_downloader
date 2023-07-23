@@ -3,8 +3,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+
+    <color name="back_ground">#1f1f1f</color>
+    <color name="text_color">#83868b</color>
+    <color name="icon_color">#83868b</color>
+    <color name="card_color">#3C3E42</color>
+    <color name="btn_color">#005281</color>
+
     <color name="transparent">#00000000</color>
-    <color name="text_color">#FF000000</color>
     <color name="ed_color">#FFFFFFFF</color>
     <color name="yt_red">#FF0000</color>
     <color name="light_grey_two">#B4B4B4</color>

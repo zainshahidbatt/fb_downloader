@@ -5,6 +5,7 @@
     android:id="@+id/my_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/back_ground"
     tools:ignore="HardcodedText">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +51,7 @@
         android:layout_marginStart="@dimen/_25sdp"
         android:layout_marginTop="@dimen/_140sdp"
         android:text="Hi, There!"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="@dimen/_22ssp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,8 +64,8 @@
         android:layout_marginStart="@dimen/_25sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:layout_marginEnd="@dimen/_25sdp"
-        android:text="Download your favourite Facebook videos and reels without watermark for free."
-        android:textColor="@color/black"
+        android:text="Download your favourite FB videos and reels without watermark for free."
+        android:textColor="@color/text_color"
         android:textSize="@dimen/_14ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,7 +102,7 @@
                 android:maxLines="1"
                 android:paddingStart="@dimen/_10sdp"
                 android:paddingEnd="@dimen/_20sdp"
-                android:textColor="@color/black"
+                android:textColor="@color/text_color"
                 android:textSize="@dimen/_10ssp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -147,10 +148,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:fitsSystemWindows="true"
         app:layout_constraintBottom_toTopOf="@+id/nativeView"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="@dimen/_10sdp"
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.button.MaterialButton
@@ -159,7 +160,7 @@
             android:layout_height="@dimen/_40sdp"
             android:layout_marginStart="@dimen/_25sdp"
             android:layout_marginEnd="@dimen/_25sdp"
-            android:backgroundTint="#1977F3"
+            android:backgroundTint="@color/btn_color"
             android:enabled="false"
             android:text="Download"
             android:textAllCaps="false"
@@ -167,6 +168,7 @@
             android:textSize="@dimen/_14ssp"
             app:cornerRadius="@dimen/_5sdp" />
     </FrameLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/drop_layout"
         android:layout_width="match_parent"
@@ -215,10 +217,10 @@
         </androidx.cardview.widget.CardView>
 
         <FrameLayout
-            android:layout_marginTop="@dimen/_5sdp"
             android:id="@+id/nativeViewDrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/_5sdp"
             app:layout_constraintTop_toBottomOf="@+id/btn_drop_down" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
